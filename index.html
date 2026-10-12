@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BD Shop Manager — দোকান ব্যবস্থাপক</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon" aria-hidden="true">🏪</span>
+    <div>
+      <div class="brand-name" id="hdrShopName">BD Shop Manager</div>
+      <div class="brand-sub" data-i18n="brandSub">Small-business POS · দোকান ব্যবস্থাপক</div>
+    </div>
+  </div>
+  <button id="langToggle" class="lang-btn" type="button">বাংলা</button>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button type="button" class="tab active" data-tab="inventory" id="tabbtn-inventory" data-i18n="tabInventory">Inventory</button>
+  <button type="button" class="tab" data-tab="sales" id="tabbtn-sales" data-i18n="tabSales">Sales</button>
+  <button type="button" class="tab" data-tab="khata" id="tabbtn-khata" data-i18n="tabKhata">Khata</button>
+  <button type="button" class="tab" data-tab="reports" id="tabbtn-reports" data-i18n="tabReports">Reports</button>
+  <button type="button" class="tab" data-tab="settings" id="tabbtn-settings" data-i18n="tabSettings">Settings</button>
+</nav>
+
+<main class="wrap">
+
+  <!-- ============ INVENTORY ============ -->
+  <section id="tab-inventory" class="panel active" role="tabpanel">
+    <div id="lowStockBanner" class="alert warn hidden">
+      <strong data-i18n="lowStockTitle">Low stock alert</strong>
+      <ul id="lowStockList"></ul>
+    </div>
+
+    <div class="card">
+      <h2 id="productFormTitle" data-i18n="addProduct">Add product</h2>
+      <div class="grid2">
+        <label><span data-i18n="fName">Product name *</span><input id="prodName" type="text" maxlength="80" autocomplete="off"></label>
+        <label><span data-i18n="fSku">SKU / code</span><input id="prodSku" type="text" maxlength="40" autocomplete="off"></label>
+        <label><span data-i18n="fBuy">Buy price (৳) *</span><input id="prodBuy" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+        <label><span data-i18n="fSell">Sell price (৳) *</span><input id="prodSell" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+        <label><span data-i18n="fStock">Opening stock</span><input id="prodStock" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+        <label><span data-i18n="fLow">Low-stock alert at</span><input id="prodLow" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+      </div>
+      <div class="row">
+        <button id="addProductBtn" class="btn primary" type="button" data-i18n="btnAddProduct">Add product</button>
+        <button id="cancelEditBtn" class="btn hidden" type="button" data-i18n="btnCancel">Cancel</button>
+      </div>
+      <p class="hint" data-i18n="moneyHint">Money: positive numbers, up to 2 decimals. Stock: whole numbers.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="productList">Products</h2>
+      <div class="table-scroll">
+      <table class="tbl" id="productTable">
+        <thead><tr>
+          <th data-i18n="thName">Name</th><th data-i18n="thSku">SKU</th>
+          <th data-i18n="thBuy">Buy</th><th data-i18n="thSell">Sell</th>
+          <th data-i18n="thMargin">Margin</th><th data-i18n="thStock">Stock</th>
+          <th data-i18n="thActions">Actions</th>
+        </tr></thead>
+        <tbody id="productTableBody"></tbody>
+      </table>
+      </div>
+      <p id="noProducts" class="empty hidden" data-i18n="noProducts">No products yet. Add your first product above.</p>
+    </div>
+  </section>
+
+  <!-- ============ SALES ============ -->
+  <section id="tab-sales" class="panel" role="tabpanel">
+    <div class="card">
+      <h2 data-i18n="newSale">New sale</h2>
+      <input id="saleSearch" type="search" class="search" data-i18n-ph="searchPh" placeholder="Search product by name or SKU…" autocomplete="off">
+      <div id="searchResults" class="results"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="cart">Cart</h2>
+      <div class="table-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th data-i18n="thItem">Item</th><th data-i18n="thPrice">Price</th>
+          <th data-i18n="thQty">Qty</th><th data-i18n="thLineTotal">Total</th><th></th>
+        </tr></thead>
+        <tbody id="cartBody"></tbody>
+      </table>
+      </div>
+      <p id="emptyCart" class="empty" data-i18n="emptyCart">Cart is empty.</p>
+
+      <div class="totals">
+        <div class="trow"><span data-i18n="subtotal">Subtotal</span><b id="sumSubtotal">৳0.00</b></div>
+        <div class="trow"><span data-i18n="discount">Discount (৳)</span><input id="discInput" type="text" inputmode="decimal" value="0" class="mini"></div>
+        <div class="trow"><span><span data-i18n="vat">VAT</span> (<span id="vatLabel">5%</span>)</span><b id="sumVat">৳0.00</b></div>
+        <div class="trow grand"><span data-i18n="total">Total</span><b id="sumTotal">৳0.00</b></div>
+      </div>
+
+      <div class="payrow">
+        <label class="radio"><input type="radio" name="payType" id="payCash" value="cash" checked> <span data-i18n="payCash">Cash</span></label>
+        <label class="radio"><input type="radio" name="payType" id="payCredit" value="credit"> <span data-i18n="payCredit">Credit (khata)</span></label>
+      </div>
+      <div id="creditCustWrap" class="hidden">
+        <div class="row">
+          <select id="customerSelect" class="grow"></select>
+        </div>
+        <details class="quickadd">
+          <summary data-i18n="quickAddCust">+ Quick-add customer</summary>
+          <div class="row">
+            <input id="quickCustName" type="text" data-i18n-ph="custNamePh" placeholder="Customer name" maxlength="80">
+            <input id="quickCustPhone" type="tel" data-i18n-ph="custPhonePh" placeholder="Phone (optional)" maxlength="20">
+            <button id="quickAddCustBtn" class="btn" type="button" data-i18n="btnAdd">Add</button>
+          </div>
+        </details>
+      </div>
+
+      <div id="saleMsg" class="msg hidden" role="alert"></div>
+      <div class="row">
+        <button id="checkoutBtn" class="btn primary big" type="button" data-i18n="btnCheckout">Checkout</button>
+        <button id="clearCartBtn" class="btn" type="button" data-i18n="btnClear">Clear</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="todaySales">Today's sales</h2>
+      <div class="table-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th data-i18n="thTime">Time</th><th data-i18n="thItems">Items</th>
+          <th data-i18n="thPayType">Type</th><th data-i18n="thTotal">Total</th>
+        </tr></thead>
+        <tbody id="todaySalesBody"></tbody>
+      </table>
+      </div>
+      <p id="noSalesToday" class="empty" data-i18n="noSalesToday">No sales recorded today yet.</p>
+    </div>
+  </section>
+
+  <!-- ============ KHATA ============ -->
+  <section id="tab-khata" class="panel" role="tabpanel">
+    <div class="card">
+      <h2 data-i18n="dueReminders">Due reminders</h2>
+      <ul id="dueList" class="dues"></ul>
+      <p id="noDues" class="empty hidden" data-i18n="noDues">No outstanding dues. 🎉</p>
+    </div>
+
+    <div id="khataListView">
+      <div class="card">
+        <h2 data-i18n="addCustomer">Add customer</h2>
+        <div class="grid2">
+          <label><span data-i18n="fCustName">Name *</span><input id="custName" type="text" maxlength="80" autocomplete="off"></label>
+          <label><span data-i18n="fCustPhone">Phone</span><input id="custPhone" type="tel" maxlength="20" autocomplete="off"></label>
+        </div>
+        <label class="block"><span data-i18n="fCustNote">Note</span><input id="custNote" type="text" maxlength="200" autocomplete="off"></label>
+        <div class="row"><button id="addCustBtn" class="btn primary" type="button" data-i18n="btnAddCustomer">Add customer</button></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="customers">Customers</h2>
+        <div class="table-scroll">
+        <table class="tbl">
+          <thead><tr>
+            <th data-i18n="thCustName">Name</th><th data-i18n="thPhone">Phone</th>
+            <th data-i18n="thBalance">Balance due</th><th data-i18n="thActions">Actions</th>
+          </tr></thead>
+          <tbody id="customerListBody"></tbody>
+        </table>
+        </div>
+        <p id="noCustomers" class="empty" data-i18n="noCustomers">No customers yet.</p>
+      </div>
+    </div>
+
+    <div id="ledgerView" class="card hidden">
+      <div class="row between">
+        <h2 id="ledgerTitle">Ledger</h2>
+        <button id="backToCustBtn" class="btn" type="button" data-i18n="btnBack">← Back</button>
+      </div>
+      <p class="balance-line"><span data-i18n="balanceDue">Balance due</span>: <b id="ledgerBal">৳0.00</b></p>
+      <div class="table-scroll">
+      <table class="tbl">
+        <thead><tr>
+          <th data-i18n="thDate">Date</th><th data-i18n="thType">Type</th>
+          <th data-i18n="thDetail">Detail</th><th data-i18n="thAmount">Amount</th>
+        </tr></thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+      </div>
+      <h3 data-i18n="recordPayment">Record payment received</h3>
+      <div class="row">
+        <input id="payAmount" type="text" inputmode="decimal" data-i18n-ph="amountPh" placeholder="Amount (৳)" class="grow">
+        <input id="payNote" type="text" data-i18n-ph="notePh" placeholder="Note (optional)" maxlength="200" class="grow">
+        <button id="recordPayBtn" class="btn primary" type="button" data-i18n="btnRecordPay">Record</button>
+      </div>
+      <div id="khataMsg" class="msg hidden" role="alert"></div>
+    </div>
+  </section>
+
+  <!-- ============ REPORTS ============ -->
+  <section id="tab-reports" class="panel" role="tabpanel">
+    <div class="card">
+      <div class="row between">
+        <h2 data-i18n="plReport">Profit / Loss report</h2>
+        <div class="seg" role="group">
+          <button type="button" id="granDay" class="segbtn active" data-i18n="daily">Daily</button>
+          <button type="button" id="granMonth" class="segbtn" data-i18n="monthly">Monthly</button>
+        </div>
+      </div>
+      <div class="cards4">
+        <div class="stat"><span data-i18n="revenue">Revenue</span><b id="cardRevenue">৳0.00</b></div>
+        <div class="stat"><span data-i18n="cogs">Cost of goods</span><b id="cardCogs">৳0.00</b></div>
+        <div class="stat good"><span data-i18n="grossProfit">Gross profit</span><b id="cardProfit">৳0.00</b></div>
+        <div class="stat warn"><span data-i18n="duesOut">Dues outstanding</span><b id="cardDues">৳0.00</b></div>
+      </div>
+      <div class="seg" role="group" aria-label="Chart metric">
+        <button type="button" id="metricRev" class="segbtn active" data-i18n="mRevenue">Revenue</button>
+        <button type="button" id="metricProfit" class="segbtn" data-i18n="mProfit">Profit</button>
+      </div>
+      <div class="chart-wrap"><svg id="chartSvg" role="img" aria-label="Sales chart"></svg></div>
+      <p class="hint" data-i18n="profitFormula">Profit = Σ (sell price − buy price) × quantity sold.</p>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="tab-settings" class="panel" role="tabpanel">
+    <div class="card">
+      <h2 data-i18n="shopSettings">Shop settings</h2>
+      <div class="grid2">
+        <label><span data-i18n="fShopName">Shop name</span><input id="setShopName" type="text" maxlength="80"></label>
+        <label><span data-i18n="fVat">VAT rate (%)</span><input id="setVat" type="text" inputmode="decimal" placeholder="5"></label>
+      </div>
+      <div class="row">
+        <button id="saveSettingsBtn" class="btn primary" type="button" data-i18n="btnSave">Save settings</button>
+      </div>
+      <h3 data-i18n="language">Language / ভাষা</h3>
+      <div class="seg" role="group">
+        <button type="button" id="langEn" class="segbtn">English</button>
+        <button type="button" id="langBn" class="segbtn">বাংলা</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="dataTitle">Data backup</h2>
+      <p class="hint" data-i18n="dataHint">All data stays in this browser (localStorage). Export a JSON backup regularly.</p>
+      <div class="row">
+        <button id="exportBtn" class="btn" type="button" data-i18n="btnExport">⬇ Export JSON</button>
+        <label class="btn filebtn"><span data-i18n="btnImport">⬆ Import JSON</span><input id="importFile" type="file" accept="application/json,.json" class="hidden"></label>
+      </div>
+      <div id="settingsMsg" class="msg hidden" role="alert"></div>
+    </div>
+
+    <div class="card danger">
+      <h2 data-i18n="dangerZone">Danger zone</h2>
+      <button id="clearBtn" class="btn danger" type="button" data-i18n="btnClearAll">Delete ALL data</button>
+    </div>
+  </section>
+</main>
+
+<!-- Stock adjust modal -->
+<div id="stockModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h3 id="stockModalTitle">Adjust stock</h3>
+    <div class="row">
+      <label class="radio"><input type="radio" name="stockDir" value="in" checked> <span data-i18n="stockIn">Stock in (+)</span></label>
+      <label class="radio"><input type="radio" name="stockDir" value="out"> <span data-i18n="stockOut">Stock out (−)</span></label>
+    </div>
+    <label class="block"><span data-i18n="fQty">Quantity</span><input id="stockQty" type="text" inputmode="numeric" value="1"></label>
+    <div class="row">
+      <button id="stockSaveBtn" class="btn primary" type="button" data-i18n="btnSave">Save</button>
+      <button id="stockCancelBtn" class="btn" type="button" data-i18n="btnCancel">Cancel</button>
+    </div>
+    <div id="stockMsg" class="msg hidden" role="alert"></div>
+  </div>
+</div>
+
+<!-- Receipt modal -->
+<div id="receiptModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-box receipt" id="receiptBox">
+    <div id="receiptBody"></div>
+    <div class="row receipt-actions">
+      <button id="printBtn" class="btn primary" type="button" data-i18n="btnPrint">🖨 Print receipt</button>
+      <button id="closeReceiptBtn" class="btn" type="button" data-i18n="btnClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
