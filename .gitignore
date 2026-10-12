@@ -1,0 +1,10 @@
+# bd-shop-manager — static app, no build step
+node_modules/
+npm-debug.log*
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+dist/
+coverage/
